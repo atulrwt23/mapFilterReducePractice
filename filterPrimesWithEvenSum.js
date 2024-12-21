@@ -7,16 +7,26 @@ const range = function (start, end, diff) {
   return numbers;
 }
 
+function isDivisible(num) {
+  return function (factor) {
+    return num % factor === 0;
+  }
+}
+
+function invert(fun) {
+  return function (...arg) {
+    return !fun(...arg);
+  }
+}
+
 function isPrime(num) {
   if (num < 2) {
     return false;
   }
 
-  const notDivisible = function (factor) {
-    return num % factor !== 0;
-  }
+  const isNotDivisible = invert(isDivisible(num));
 
-  return range(2, Math.sqrt(num), 1).every(notDivisible);
+  return range(2, Math.sqrt(num), 1).every(isNotDivisible);
 }
 
 function isEven(num) {
@@ -107,12 +117,29 @@ function testPrimeWithEvenSums() {
   testFunctions(primeWithEvenSums, [1, 2, 3, 11, 23, 19], [2, 11, 19]);
 }
 
+function testIsDivisible() {
+  testFunctions(isDivisible(1), 1, true);
+  testFunctions(isDivisible(2), 2, true);
+  testFunctions(isDivisible(3), -1, true);
+  testFunctions(isDivisible(5), 3, false);
+  testFunctions(isDivisible(11), 3, false);
+}
+
+function testInvert() {
+  testFunctions(invert(isDivisible(2)), 1, false)
+  testFunctions(invert(isDivisible(2)), 2, false)
+  testFunctions(invert(isDivisible(5)), 2, true)
+  testFunctions(invert(isDivisible(7)), 11, true)
+}
+
 function testAll() {
   testIsPrime();
   testIsEven();
   testSumOfDigits();
   testIsPrimeHasEvenSum();
   testPrimeWithEvenSums();
+  testIsDivisible();
+  testInvert();
 }
 
 testAll();
